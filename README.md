@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/binance4py_logo.png" alt="binance4py logo" width="480">
+  <img src="https://raw.githubusercontent.com/ren3104/binance4py/main/assets/binance4py_logo.png" alt="binance4py logo" width="480">
 </p>
 
 <p align="center">
