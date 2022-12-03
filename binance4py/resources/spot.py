@@ -1,7 +1,8 @@
 from decimal import Decimal
 from typing import Optional, Union
-from .base import Resource
+
 from ..typing import JsonObject
+from .base import Resource
 
 
 class Spot(Resource):
@@ -20,7 +21,7 @@ class Spot(Resource):
         strategy_type: Optional[int] = None,
         trailing_delta: Optional[int] = None,
         iceberg_qty: Optional[Union[int, float, Decimal]] = None,
-        order_resp_type: Optional[str] = None
+        order_resp_type: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
@@ -40,10 +41,10 @@ class Spot(Resource):
                 "stopPrice": stop_price,
                 "trailingDelta": trailing_delta,
                 "icebergQty": iceberg_qty,
-                "newOrderRespType": order_resp_type
-            }
+                "newOrderRespType": order_resp_type,
+            },
         )
-    
+
     async def create_order(
         self,
         symbol: str,
@@ -59,7 +60,7 @@ class Spot(Resource):
         strategy_type: Optional[int] = None,
         trailing_delta: Optional[int] = None,
         iceberg_qty: Optional[Union[int, float, Decimal]] = None,
-        order_resp_type: Optional[str] = None
+        order_resp_type: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
@@ -79,16 +80,16 @@ class Spot(Resource):
                 "stopPrice": stop_price,
                 "trailingDelta": trailing_delta,
                 "icebergQty": iceberg_qty,
-                "newOrderRespType": order_resp_type
-            }
+                "newOrderRespType": order_resp_type,
+            },
         )
-    
+
     async def cancel_order(
         self,
         symbol: str,
         order_id: Optional[int] = None,
         orig_client_order_id: Optional[str] = None,
-        new_client_order_id: Optional[str] = None
+        new_client_order_id: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="DELETE",
@@ -98,23 +99,23 @@ class Spot(Resource):
                 "symbol": symbol,
                 "orderId": order_id,
                 "origClientOrderId": orig_client_order_id,
-                "newClientOrderId": new_client_order_id
-            }
+                "newClientOrderId": new_client_order_id,
+            },
         )
-    
+
     async def cancel_all_open_orders(self, symbol: str) -> JsonObject:
         return await self._client.request(
             method="DELETE",
             url=self._client._API_URL + self._client._endpoints.cancel_all_open_orders,
             signed=True,
-            params={"symbol": symbol}
+            params={"symbol": symbol},
         )
-    
+
     async def query_order(
         self,
         symbol: str,
         order_id: Optional[int] = None,
-        orig_client_order_id: Optional[str] = None
+        orig_client_order_id: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
@@ -123,10 +124,10 @@ class Spot(Resource):
             params={
                 "symbol": symbol,
                 "orderId": order_id,
-                "origClientOrderId": orig_client_order_id
-            }
+                "origClientOrderId": orig_client_order_id,
+            },
         )
-    
+
     async def replace_order(
         self,
         symbol: str,
@@ -146,7 +147,7 @@ class Spot(Resource):
         strategy_type: Optional[int] = None,
         trailing_delta: Optional[int] = None,
         iceberg_qty: Optional[Union[int, float, Decimal]] = None,
-        order_resp_type: Optional[str] = None
+        order_resp_type: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
@@ -170,18 +171,18 @@ class Spot(Resource):
                 "stopPrice": stop_price,
                 "trailingDelta": trailing_delta,
                 "icebergQty": iceberg_qty,
-                "newOrderRespType": order_resp_type
-            }
+                "newOrderRespType": order_resp_type,
+            },
         )
-    
+
     async def open_orders(self, symbol: Optional[str] = None) -> JsonObject:
         return await self._client.request(
             method="GET",
             url=self._client._API_URL + self._client._endpoints.open_orders,
             signed=True,
-            params={"symbol": symbol}
+            params={"symbol": symbol},
         )
-    
+
     async def all_orders(
         self,
         symbol: str,
@@ -199,10 +200,10 @@ class Spot(Resource):
                 "orderId": order_id,
                 "startTime": start_time,
                 "endTime": end_time,
-                "limit": limit
-            }
+                "limit": limit,
+            },
         )
-    
+
     async def create_oco_order(
         self,
         symbol: str,
@@ -246,16 +247,16 @@ class Spot(Resource):
                 "stopLimitPrice": stop_limit_price,
                 "stopIcebergQty": stop_iceberg_qty,
                 "stopLimitTimeInForce": stop_limit_time_in_force,
-                "newOrderRespType": new_order_resp_type
-            }
+                "newOrderRespType": new_order_resp_type,
+            },
         )
-    
+
     async def cancel_oco_order(
         self,
         symbol: str,
         order_list_id: Optional[int] = None,
         list_client_order_id: Optional[str] = None,
-        new_client_order_id: Optional[str] = None
+        new_client_order_id: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="DELETE",
@@ -265,14 +266,14 @@ class Spot(Resource):
                 "symbol": symbol,
                 "orderListId": order_list_id,
                 "listClientOrderId": list_client_order_id,
-                "newClientOrderId": new_client_order_id
-            }
+                "newClientOrderId": new_client_order_id,
+            },
         )
-    
+
     async def query_oco_order(
         self,
         order_list_id: Optional[int] = None,
-        orig_client_order_id: Optional[str] = None
+        orig_client_order_id: Optional[str] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
@@ -280,16 +281,16 @@ class Spot(Resource):
             signed=True,
             params={
                 "orderListId": order_list_id,
-                "origClientOrderId": orig_client_order_id
-            }
+                "origClientOrderId": orig_client_order_id,
+            },
         )
-    
+
     async def query_all_oco_order(
         self,
         from_id: Optional[int] = None,
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
@@ -299,24 +300,24 @@ class Spot(Resource):
                 "fromId": from_id,
                 "startTime": start_time,
                 "endTime": end_time,
-                "limit": limit
-            }
+                "limit": limit,
+            },
         )
-    
+
     async def query_open_oco_order(self) -> JsonObject:
         return await self._client.request(
             method="GET",
             url=self._client._API_URL + self._client._endpoints.query_open_oco_order,
-            signed=True
+            signed=True,
         )
-    
+
     async def account_info(self) -> JsonObject:
         return await self._client.request(
             method="GET",
             url=self._client._API_URL + self._client._endpoints.account_info,
-            signed=True
+            signed=True,
         )
-    
+
     async def account_trade_list(
         self,
         symbol: str,
@@ -324,7 +325,7 @@ class Spot(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         from_id: Optional[int] = None,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
@@ -336,13 +337,13 @@ class Spot(Resource):
                 "startTime": start_time,
                 "endTime": end_time,
                 "fromId": from_id,
-                "limit": limit
-            }
+                "limit": limit,
+            },
         )
-    
+
     async def order_rate_limit(self) -> JsonObject:
         return await self._client.request(
             method="GET",
             url=self._client._API_URL + self._client._endpoints.order_rate_limit,
-            signed=True
+            signed=True,
         )

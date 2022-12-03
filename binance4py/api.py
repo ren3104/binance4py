@@ -1,9 +1,10 @@
 import json
 from typing import Optional
+
 from .client import Client
 from .endpoints import Endpoints
-from .typing import JsonDumper, JsonLoader
 from .resources import *
+from .typing import JsonDumper, JsonLoader
 from .websocket import Websocket
 
 
@@ -20,7 +21,7 @@ class Binance(Client):
         testnet: bool = False,
         # output_json: bool = False,
         json_dumps: JsonDumper = json.dumps,
-        json_loads: JsonLoader = json.loads
+        json_loads: JsonLoader = json.loads,
     ) -> None:
         super().__init__(
             api_key,
@@ -31,7 +32,7 @@ class Binance(Client):
             testnet,
             # output_json,
             json_dumps,
-            json_loads
+            json_loads,
         )
 
         self.general = General(self)

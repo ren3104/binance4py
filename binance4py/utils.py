@@ -4,13 +4,13 @@ from decimal import Decimal
 from typing import Any, Dict, Union
 
 
-def create_query_dict(params: Dict[str, Any]) -> Dict[str, str]:
+def create_query_dict(params: Dict[str, Any]) -> Dict[str, Any]:
     query_dict = {}
     for k, v in params.items():
         if v is None:
             continue
         elif isinstance(v, list):
-            query_dict[k] = str(v).replace("'", "\"").replace(" ", "")
+            query_dict[k] = str(v).replace("'", '"').replace(" ", "")
         elif isinstance(v, (int, float, Decimal)):
             query_dict[k] = number_to_string(v)
         else:

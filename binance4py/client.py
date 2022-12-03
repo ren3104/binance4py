@@ -1,14 +1,15 @@
-from aiohttp import ClientSession, ContentTypeError
-import json
-import hmac
 import hashlib
+import hmac
+import json
+from typing import Any, Dict, Optional
 from urllib.parse import urlencode
-from typing import Optional, Dict, Any
-from .endpoints import Endpoints
-from .typing import JsonObject, JsonDumper, JsonLoader
-from .exception import BinanceApiException
-from .utils import create_query_dict, get_timestamp
 
+from aiohttp import ClientSession, ContentTypeError
+
+from .endpoints import Endpoints
+from .exception import BinanceApiException
+from .typing import JsonDumper, JsonLoader, JsonObject
+from .utils import create_query_dict, get_timestamp
 
 API_URL = "https://api{}.binance.{}/api/"
 
@@ -24,7 +25,7 @@ class Client:
         # "_output_json",
         "_json_dumps",
         "_json_loads",
-        "_session"
+        "_session",
     ]
 
     def __init__(
@@ -37,7 +38,7 @@ class Client:
         testnet: bool = False,
         # output_json: bool = False,
         json_dumps: JsonDumper = json.dumps,
-        json_loads: JsonLoader = json.loads
+        json_loads: JsonLoader = json.loads,
     ) -> None:
         self._api_key = api_key
         self._api_secret = api_secret
@@ -51,34 +52,33 @@ class Client:
         self._json_dumps = json_dumps
         self._json_loads = json_loads
 
-        headers = {
-            "User-Agent": "binance4py",
-            "Accept": "application/json"
-        }
+        headers = {"User-Agent": "binance4py", "Accept": "application/json"}
         if self._api_key:
             headers["X-MBX-APIKEY"] = self._api_key
-        self._session = ClientSession(
-            headers=headers,
-            json_serialize=self._json_dumps
-        )
-    
+        self._session = ClientSession(headers=headers, json_serialize=self._json_dumps)
+
     @property
     def closed(self) -> bool:
         return self._session.closed
-    
+
     def _generate_signature(self, query: str) -> str:
-        return hmac.new(self._api_secret.encode("utf-8"), query.encode("utf-8"), hashlib.sha256).hexdigest()
+        if self._api_secret is None:
+            raise Exception("Api secret cannot be None")
+
+        return hmac.new(
+            self._api_secret.encode("utf-8"), query.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
 
     async def request(
         self,
         method: str,
         url: str,
         signed: bool = False,
-        params: Optional[Dict[str, Any]] = None
+        params: Optional[Dict[str, Any]] = None,
     ) -> JsonObject:
         if params is not None:
             params = create_query_dict(params)
-        
+
         if signed:
             if params is None:
                 params = {}
@@ -92,8 +92,10 @@ class Client:
             try:
                 return await response.json(loads=self._json_loads)
             except ContentTypeError:
-                raise Exception(f'Invalid response content type: {response.content_type}')
-    
+                raise Exception(
+                    f"Invalid response content type: {response.content_type}"
+                )
+
     async def open(self) -> "Client":
         return self
 
@@ -104,6 +106,6 @@ class Client:
 
     async def __aenter__(self) -> "Client":
         return await self.open()
-    
+
     async def __aexit__(self, *args) -> None:
         await self.close()
