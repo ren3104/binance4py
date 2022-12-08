@@ -1,7 +1,8 @@
 from decimal import Decimal
 from typing import Optional, Union
 
-from ..typing import JsonObject
+from binance4py.typing import JsonObject
+
 from .base import Resource
 
 

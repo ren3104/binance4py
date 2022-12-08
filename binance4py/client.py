@@ -6,10 +6,10 @@ from urllib.parse import urlencode
 
 from aiohttp import ClientSession, ContentTypeError
 
-from .endpoints import Endpoints
-from .exception import BinanceApiException
-from .typing import JsonDumper, JsonLoader, JsonObject
-from .utils import create_query_dict, get_timestamp
+from binance4py.endpoints import Endpoints
+from binance4py.exception import BinanceApiException
+from binance4py.typing import JsonDumper, JsonLoader, JsonObject
+from binance4py.utils import create_query_dict, get_timestamp
 
 API_URL = "https://api{}.binance.{}/api/"
 

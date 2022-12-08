@@ -1,4 +1,4 @@
-from ..client import Client
+from binance4py.client import Client
 
 
 class Resource:

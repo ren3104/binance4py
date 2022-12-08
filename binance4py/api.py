@@ -1,11 +1,11 @@
 import json
 from typing import Optional
 
-from .client import Client
-from .endpoints import Endpoints
-from .resources import *
-from .typing import JsonDumper, JsonLoader
-from .websocket import Websocket
+from binance4py.client import Client
+from binance4py.endpoints import Endpoints
+from binance4py.resources import *
+from binance4py.typing import JsonDumper, JsonLoader
+from binance4py.websocket import Websocket
 
 
 class Binance(Client):
