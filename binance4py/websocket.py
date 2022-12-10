@@ -99,8 +99,20 @@ class Websocket(Resource):
     async def subscriptions(self) -> List[str]:
         return (await self._send("LIST_SUBSCRIPTIONS"))["result"]
 
-    async def kline(self, callback: Callable, symbol: str, interval: str):
+    async def kline(self, callback: Callable, symbol: str, interval: str) -> None:
         await self.subscribe(f"{symbol}@kline_{interval}", callback)
+
+    async def _keep_alive_user_stream(
+        self, listen_key: str, interval: int = 1800
+    ) -> None:
+        while True:
+            await asyncio.sleep(interval)
+            await self.keep_alive_listen_key(listen_key)
+
+    async def user_data(self, callback: Callable) -> None:
+        listen_key = await self.create_listen_key()
+        asyncio.ensure_future(self._keep_alive_user_stream(listen_key))
+        await self.subscribe(listen_key, callback)
 
     async def start(self) -> None:
         if not self.closed:
