@@ -100,8 +100,47 @@ class Websocket(Resource):
     async def subscriptions(self) -> List[str]:
         return (await self._send("LIST_SUBSCRIPTIONS"))["result"]
 
+    async def aggregate_trade(self, callback: Callable, symbol: str) -> None:
+        await self.subscribe(f"{symbol}@aggTrade", callback)
+
+    async def trade(self, callback: Callable, symbol: str) -> None:
+        await self.subscribe(f"{symbol}@trade", callback)
+
     async def kline(self, callback: Callable, symbol: str, interval: str) -> None:
         await self.subscribe(f"{symbol}@kline_{interval}", callback)
+
+    async def mini_ticker(self, callback: Callable, symbol: str) -> None:
+        await self.subscribe(f"{symbol}@miniTicker", callback)
+
+    async def mini_tickers(self, callback: Callable) -> None:
+        await self.subscribe("!miniTicker@arr", callback)
+
+    async def ticker(self, callback: Callable, symbol: str) -> None:
+        await self.subscribe(f"{symbol}@ticker", callback)
+
+    async def tickers(self, callback: Callable) -> None:
+        await self.subscribe("!ticker@arr", callback)
+
+    async def window_ticker(
+        self, callback: Callable, symbol: str, window_size: str
+    ) -> None:
+        await self.subscribe(f"{symbol}@ticker_{window_size}", callback)
+
+    async def window_tickers(self, callback: Callable, window_size: str) -> None:
+        await self.subscribe(f"!ticker_{window_size}@arr", callback)
+
+    async def book_ticker(self, callback: Callable, symbol: str) -> None:
+        await self.subscribe(f"{symbol}@bookTicker", callback)
+
+    async def partial_depth(
+        self, callback: Callable, symbol: str, levels: int, update_speed: int = 1000
+    ) -> None:
+        await self.subscribe(f"{symbol}@depth{levels}@{update_speed}ms", callback)
+
+    async def depth(
+        self, callback: Callable, symbol: str, update_speed: int = 1000
+    ) -> None:
+        await self.subscribe(f"{symbol}@depth@{update_speed}ms", callback)
 
     async def _keep_alive_user_stream(
         self, listen_key: str, interval: int = 1800
