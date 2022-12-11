@@ -35,8 +35,10 @@ async def main():
     client = Binance("<API_KEY>", "<API_SECRET>")
     async with client:
         print(await client.general.server_time())
-        client.ws.kline("btcbusd", "1m", handle_kline)
         await client.ws.start()
+        await client.ws.kline(handle_kline, "btcbusd", "1m")
+        print(await client.ws.subscriptions())
+        await client.ws.wait_stop()
 
 
 asyncio.run(main())
