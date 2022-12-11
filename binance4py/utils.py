@@ -26,12 +26,18 @@ def get_timestamp() -> int:
     return int(time.time() * 1000)
 
 
-def quantize_tick_size(num: Union[str, int, float, Decimal], tick_size: str) -> Decimal:
+def quantize_tick_size(
+    num: Union[str, int, float, Decimal], tick_size: Union[str, Decimal]
+) -> Decimal:
     if isinstance(num, (int, float)):
         num = str(num)
     if isinstance(num, str):
         num = Decimal(num)
-    return num.quantize(Decimal(tick_size).normalize()).normalize()
+
+    if isinstance(tick_size, str):
+        tick_size = Decimal(tick_size)
+
+    return num.quantize(tick_size.normalize()).normalize()
 
 
 def number_to_string(num: Union[int, float, Decimal]) -> str:
