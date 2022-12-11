@@ -12,7 +12,9 @@ WEBSOCKET_URL = "wss://stream.binance.{}:443/stream"
 class Websocket(Resource):
     __slots__ = [
         "_WEBSOCKET_URL",
-        "_ws_conn",
+        "_conn",
+        "_open_event",
+        "_close_event",
         "_rate_limit",
         "_listeners",
         "_stream_callbacks",
@@ -23,7 +25,9 @@ class Websocket(Resource):
         super().__init__(client)
         self._WEBSOCKET_URL = WEBSOCKET_URL.format(self._client._tld)
 
-        self._ws_conn: Optional[ClientWebSocketResponse] = None
+        self._conn: Optional[ClientWebSocketResponse] = None
+        self._open_event = asyncio.Event()
+        self._close_event = asyncio.Event()
         self._rate_limit = asyncio.Semaphore(5)  # rps
         self._listeners: Dict[int, asyncio.Future] = {}
         self._stream_callbacks: Dict[str, List[Callable]] = {}
@@ -31,7 +35,7 @@ class Websocket(Resource):
 
     @property
     def closed(self) -> bool:
-        return self._ws_conn is None
+        return self._conn is None
 
     async def create_listen_key(self) -> str:
         return (
@@ -62,7 +66,11 @@ class Websocket(Resource):
             raise Exception("Websocket connection is closed")
 
         async with self._rate_limit:
+            if self._rate_limit.locked():
+                await asyncio.sleep(1)
+
             d = {"method": method, "id": self._last_id}
+            self._last_id += 1
 
             if params is not None:
                 d["params"] = params
@@ -70,18 +78,11 @@ class Websocket(Resource):
             future = asyncio.get_running_loop().create_future()
             self._listeners[cast(int, d["id"])] = future
 
-            await self._ws_conn.send_json(  # type:ignore
+            await self._conn.send_json(  # type:ignore
                 data=d, dumps=self._client._json_dumps
             )
 
-            self._last_id += 1
-
-            res = await asyncio.wait_for(future, 5)
-
-            if self._rate_limit.locked():
-                await asyncio.sleep(1)
-
-        return res
+            return await asyncio.wait_for(future, 10)
 
     async def subscribe(self, stream: str, callback: Callable) -> None:
         if stream not in self._stream_callbacks:
@@ -114,15 +115,15 @@ class Websocket(Resource):
         asyncio.ensure_future(self._keep_alive_user_stream(listen_key))
         await self.subscribe(listen_key, callback)
 
-    async def start(self) -> None:
-        if not self.closed:
-            return
-
+    async def _starter(self) -> None:
         try:
             async with self._client._session.ws_connect(
                 url=self._WEBSOCKET_URL, heartbeat=180
             ) as ws:
-                self._ws_conn = ws
+                self._conn = ws
+
+                self._open_event.set()
+                self._close_event.clear()
 
                 async for msg in ws:
                     if msg.type == WSMsgType.TEXT:
@@ -139,12 +140,29 @@ class Websocket(Resource):
                             self._listeners.pop(data["id"])
                         elif "stream" in data:
                             for callback in self._stream_callbacks[data["stream"]]:
-                                await callback(data)
+                                await callback(data["data"])
         finally:
+            self._last_id = 1
+            self._listeners.clear()
             self._stream_callbacks.clear()
+
+            self._close_event.set()
+            self._open_event.clear()
+
+    async def start(self) -> None:
+        if not self.closed:
+            return
+
+        asyncio.ensure_future(self._starter())
+
+        await self._open_event.wait()
 
     async def stop(self) -> None:
         if self.closed:
             return
 
-        self._ws_conn.close()  # type:ignore
+        await self._conn.close()  # type:ignore
+
+    async def wait_stop(self) -> None:
+        if not self._close_event.is_set():
+            await self._close_event.wait()
