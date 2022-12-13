@@ -26,7 +26,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
-            url=self._client._API_URL + self._client._endpoints.create_test_order,
+            url=self._client._api_url + self._client._endpoints.create_test_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -65,7 +65,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
-            url=self._client._API_URL + self._client._endpoints.create_order,
+            url=self._client._api_url + self._client._endpoints.create_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -94,7 +94,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="DELETE",
-            url=self._client._API_URL + self._client._endpoints.cancel_order,
+            url=self._client._api_url + self._client._endpoints.cancel_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -107,7 +107,7 @@ class Spot(Resource):
     async def cancel_all_open_orders(self, symbol: str) -> JsonObject:
         return await self._client.request(
             method="DELETE",
-            url=self._client._API_URL + self._client._endpoints.cancel_all_open_orders,
+            url=self._client._api_url + self._client._endpoints.cancel_all_open_orders,
             signed=True,
             params={"symbol": symbol},
         )
@@ -120,7 +120,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.query_order,
+            url=self._client._api_url + self._client._endpoints.query_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -152,7 +152,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
-            url=self._client._API_URL + self._client._endpoints.replace_order,
+            url=self._client._api_url + self._client._endpoints.replace_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -179,7 +179,7 @@ class Spot(Resource):
     async def open_orders(self, symbol: Optional[str] = None) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.open_orders,
+            url=self._client._api_url + self._client._endpoints.open_orders,
             signed=True,
             params={"symbol": symbol},
         )
@@ -194,7 +194,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.all_orders,
+            url=self._client._api_url + self._client._endpoints.all_orders,
             signed=True,
             params={
                 "symbol": symbol,
@@ -228,7 +228,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="POST",
-            url=self._client._API_URL + self._client._endpoints.create_oco_order,
+            url=self._client._api_url + self._client._endpoints.create_oco_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -261,7 +261,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="DELETE",
-            url=self._client._API_URL + self._client._endpoints.cancel_oco_order,
+            url=self._client._api_url + self._client._endpoints.cancel_oco_order,
             signed=True,
             params={
                 "symbol": symbol,
@@ -278,7 +278,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.query_oco_order,
+            url=self._client._api_url + self._client._endpoints.query_oco_order,
             signed=True,
             params={
                 "orderListId": order_list_id,
@@ -295,7 +295,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.query_all_oco_order,
+            url=self._client._api_url + self._client._endpoints.query_all_oco_order,
             signed=True,
             params={
                 "fromId": from_id,
@@ -308,14 +308,14 @@ class Spot(Resource):
     async def query_open_oco_order(self) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.query_open_oco_order,
+            url=self._client._api_url + self._client._endpoints.query_open_oco_order,
             signed=True,
         )
 
     async def account_info(self) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.account_info,
+            url=self._client._api_url + self._client._endpoints.account_info,
             signed=True,
         )
 
@@ -330,7 +330,7 @@ class Spot(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.account_trade_list,
+            url=self._client._api_url + self._client._endpoints.account_trade_list,
             signed=True,
             params={
                 "symbol": symbol,
@@ -345,6 +345,6 @@ class Spot(Resource):
     async def order_rate_limit(self) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.order_rate_limit,
+            url=self._client._api_url + self._client._endpoints.order_rate_limit,
             signed=True,
         )

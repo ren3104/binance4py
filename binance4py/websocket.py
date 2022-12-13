@@ -7,6 +7,7 @@ from binance4py.resources import Resource
 from binance4py.typing import JsonObject
 
 WEBSOCKET_URL = "wss://stream.binance.{}:443/stream"
+WEBSOCKET_TEST_URL = "wss://testnet.binance.vision/stream"
 
 
 class Websocket(Resource):
@@ -23,7 +24,11 @@ class Websocket(Resource):
 
     def __init__(self, client) -> None:
         super().__init__(client)
-        self._WEBSOCKET_URL = WEBSOCKET_URL.format(self._client._tld)
+        self._WEBSOCKET_URL = (
+            WEBSOCKET_URL.format(self._client._tld)
+            if not self._client._testnet
+            else WEBSOCKET_TEST_URL
+        )
 
         self._conn: Optional[ClientWebSocketResponse] = None
         self._open_event = asyncio.Event()
@@ -41,21 +46,21 @@ class Websocket(Resource):
         return (
             await self._client.request(
                 method="POST",
-                url=self._client._API_URL + self._client._endpoints.create_listen_key,
+                url=self._client._api_url + self._client._endpoints.create_listen_key,
             )
         )["listenKey"]
 
     async def keep_alive_listen_key(self, listen_key: str) -> None:
         await self._client.request(
             method="PUT",
-            url=self._client._API_URL + self._client._endpoints.keep_alive_listen_key,
+            url=self._client._api_url + self._client._endpoints.keep_alive_listen_key,
             params={"listenKey": listen_key},
         )
 
     async def close_listen_key(self, listen_key: str) -> None:
         await self._client.request(
             method="DELETE",
-            url=self._client._API_URL + self._client._endpoints.close_listen_key,
+            url=self._client._api_url + self._client._endpoints.close_listen_key,
             params={"listenKey": listen_key},
         )
 

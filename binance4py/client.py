@@ -12,6 +12,7 @@ from binance4py.typing import JsonDumper, JsonLoader, JsonObject
 from binance4py.utils import create_query_dict, get_timestamp
 
 API_URL = "https://api{}.binance.{}/api/"
+API_TEST_URL = ""
 
 
 class Client:
@@ -21,8 +22,7 @@ class Client:
         "_testnet",
         "_endpoints",
         "_tld",
-        "_API_URL",
-        # "_output_json",
+        "_api_url",
         "_json_dumps",
         "_json_loads",
         "_session",
@@ -36,7 +36,6 @@ class Client:
         tld: str = "com",
         cluster: Optional[int] = None,
         testnet: bool = False,
-        # output_json: bool = False,
         json_dumps: JsonDumper = json.dumps,
         json_loads: JsonLoader = json.loads,
     ) -> None:
@@ -46,9 +45,10 @@ class Client:
 
         self._endpoints = endpoints
         self._tld = tld
-        self._API_URL = API_URL.format(cluster or "", self._tld)
+        self._api_url = (
+            API_URL.format(cluster or "", self._tld) if not testnet else API_TEST_URL
+        )
 
-        # self._output_json = output_json
         self._json_dumps = json_dumps
         self._json_loads = json_loads
 

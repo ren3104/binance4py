@@ -19,7 +19,6 @@ class Binance(Client):
         tld: str = "com",
         cluster: Optional[int] = None,
         testnet: bool = False,
-        # output_json: bool = False,
         json_dumps: JsonDumper = json.dumps,
         json_loads: JsonLoader = json.loads,
     ) -> None:
@@ -30,7 +29,6 @@ class Binance(Client):
             tld,
             cluster,
             testnet,
-            # output_json,
             json_dumps,
             json_loads,
         )

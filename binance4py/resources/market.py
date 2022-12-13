@@ -9,7 +9,7 @@ class Market(Resource):
     async def order_book(self, symbol: str, limit: Optional[int] = None) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.order_book,
+            url=self._client._api_url + self._client._endpoints.order_book,
             params={"symbol": symbol, "limit": limit},
         )
 
@@ -18,7 +18,7 @@ class Market(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.recent_trades,
+            url=self._client._api_url + self._client._endpoints.recent_trades,
             params={"symbol": symbol, "limit": limit},
         )
 
@@ -27,7 +27,7 @@ class Market(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.old_trades,
+            url=self._client._api_url + self._client._endpoints.old_trades,
             params={"symbol": symbol, "limit": limit, "fromId": from_id},
         )
 
@@ -41,7 +41,7 @@ class Market(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.aggregate_trades,
+            url=self._client._api_url + self._client._endpoints.aggregate_trades,
             params={
                 "symbol": symbol,
                 "fromId": from_id,
@@ -61,7 +61,7 @@ class Market(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.klines,
+            url=self._client._api_url + self._client._endpoints.klines,
             params={
                 "symbol": symbol,
                 "interval": interval,
@@ -81,7 +81,7 @@ class Market(Resource):
     ) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.ui_klines,
+            url=self._client._api_url + self._client._endpoints.ui_klines,
             params={
                 "symbol": symbol,
                 "interval": interval,
@@ -94,7 +94,7 @@ class Market(Resource):
     async def average_price(self, symbol: str) -> JsonObject:
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.average_price,
+            url=self._client._api_url + self._client._endpoints.average_price,
             params={"symbol": symbol},
         )
 
@@ -108,7 +108,7 @@ class Market(Resource):
 
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.ticker_24hr,
+            url=self._client._api_url + self._client._endpoints.ticker_24hr,
             params={"symbols": symbols, "type": type},
         )
 
@@ -120,7 +120,7 @@ class Market(Resource):
 
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.price_ticker,
+            url=self._client._api_url + self._client._endpoints.price_ticker,
             params={"symbols": symbols},
         )
 
@@ -132,7 +132,7 @@ class Market(Resource):
 
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.order_book_ticker,
+            url=self._client._api_url + self._client._endpoints.order_book_ticker,
             params={"symbols": symbols},
         )
 
@@ -147,6 +147,6 @@ class Market(Resource):
 
         return await self._client.request(
             method="GET",
-            url=self._client._API_URL + self._client._endpoints.rolling_window_ticker,
+            url=self._client._api_url + self._client._endpoints.rolling_window_ticker,
             params={"symbols": symbols, "windowSize": window_size, "type": type},
         )
