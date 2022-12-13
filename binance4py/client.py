@@ -12,7 +12,7 @@ from binance4py.typing import JsonDumper, JsonLoader, JsonObject
 from binance4py.utils import create_query_dict, get_timestamp
 
 API_URL = "https://api{}.binance.{}/api/"
-API_TEST_URL = ""
+API_TEST_URL = "https://testnet.binance.vision/api/"
 
 
 class Client:
