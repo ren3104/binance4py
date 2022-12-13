@@ -43,4 +43,7 @@ def quantize_tick_size(
 
 
 def number_to_string(num: Union[int, float, Decimal]) -> str:
-    return "{:f}".format(num).rstrip("0").rstrip(".")
+    formatted_num = "{:f}".format(num)
+    if "." in formatted_num:
+        return "{:f}".format(num).rstrip("0").rstrip(".")
+    return formatted_num
