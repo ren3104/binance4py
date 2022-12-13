@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 
 def create_query_dict(params: Dict[str, Any]) -> Dict[str, Any]:
@@ -27,7 +27,9 @@ def get_timestamp() -> int:
 
 
 def quantize_tick_size(
-    num: Union[str, int, float, Decimal], tick_size: Union[str, Decimal]
+    num: Union[str, int, float, Decimal],
+    tick_size: Union[str, Decimal],
+    rounding: Optional[str] = None,
 ) -> Decimal:
     if isinstance(num, (int, float)):
         num = str(num)
@@ -37,7 +39,7 @@ def quantize_tick_size(
     if isinstance(tick_size, str):
         tick_size = Decimal(tick_size)
 
-    return num.quantize(tick_size.normalize()).normalize()
+    return num.quantize(tick_size.normalize(), rounding).normalize()
 
 
 def number_to_string(num: Union[int, float, Decimal]) -> str:
