@@ -12,7 +12,7 @@ WEBSOCKET_TEST_URL = "wss://testnet.binance.vision/stream"
 
 class Websocket(Resource):
     __slots__ = [
-        "_WEBSOCKET_URL",
+        "_websocket_url",
         "_conn",
         "_open_event",
         "_close_event",
@@ -20,11 +20,12 @@ class Websocket(Resource):
         "_listeners",
         "_stream_callbacks",
         "_last_id",
+        "_listen_key",
     ]
 
     def __init__(self, client) -> None:
         super().__init__(client)
-        self._WEBSOCKET_URL = (
+        self._websocket_url = (
             WEBSOCKET_URL.format(self._client._tld)
             if not self._client._testnet
             else WEBSOCKET_TEST_URL
@@ -33,10 +34,13 @@ class Websocket(Resource):
         self._conn: Optional[ClientWebSocketResponse] = None
         self._open_event = asyncio.Event()
         self._close_event = asyncio.Event()
+
         self._rate_limit = asyncio.Semaphore(5)  # rps
         self._listeners: Dict[int, asyncio.Future] = {}
         self._stream_callbacks: Dict[str, List[Callable]] = {}
         self._last_id = 1
+
+        self._listen_key: Optional[str] = None
 
     @property
     def closed(self) -> bool:
@@ -89,63 +93,71 @@ class Websocket(Resource):
 
             return await asyncio.wait_for(future, 10)
 
-    async def subscribe(self, stream: str, callback: Callable) -> None:
+    async def subscribe(self, stream: str) -> JsonObject:
+        return await self._send("SUBSCRIBE", [stream])
+
+    async def subscribe_callback(self, stream: str, callback: Callable) -> None:
         if stream not in self._stream_callbacks:
-            await self._send("SUBSCRIBE", [stream])
+            await self.subscribe(stream)
 
             self._stream_callbacks[stream] = [callback]
         else:
             self._stream_callbacks[stream].append(callback)
 
-    async def unsubscribe(self, stream: str) -> None:
-        await self._send("UNSUBSCRIBE", [stream])
+    async def unsubscribe(self, stream: str) -> JsonObject:
+        return await self._send("UNSUBSCRIBE", [stream])
+
+    async def unsubscribe_all_callbacks(self, stream) -> None:
+        await self.unsubscribe(stream)
         if stream in self._stream_callbacks:
-            del self._stream_callbacks[stream]
+            self._stream_callbacks.pop(stream)
 
     async def subscriptions(self) -> List[str]:
         return (await self._send("LIST_SUBSCRIPTIONS"))["result"]
 
     async def aggregate_trade(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe(f"{symbol}@aggTrade", callback)
+        await self.subscribe_callback(f"{symbol}@aggTrade", callback)
 
     async def trade(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe(f"{symbol}@trade", callback)
+        await self.subscribe_callback(f"{symbol}@trade", callback)
 
     async def kline(self, callback: Callable, symbol: str, interval: str) -> None:
-        await self.subscribe(f"{symbol}@kline_{interval}", callback)
+        await self.subscribe_callback(f"{symbol}@kline_{interval}", callback)
 
     async def mini_ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe(f"{symbol}@miniTicker", callback)
+        await self.subscribe_callback(f"{symbol}@miniTicker", callback)
 
     async def mini_tickers(self, callback: Callable) -> None:
-        await self.subscribe("!miniTicker@arr", callback)
+        await self.subscribe_callback("!miniTicker@arr", callback)
 
     async def ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe(f"{symbol}@ticker", callback)
+        await self.subscribe_callback(f"{symbol}@ticker", callback)
 
     async def tickers(self, callback: Callable) -> None:
-        await self.subscribe("!ticker@arr", callback)
+        await self.subscribe_callback("!ticker@arr", callback)
 
     async def window_ticker(
         self, callback: Callable, symbol: str, window_size: str
     ) -> None:
-        await self.subscribe(f"{symbol}@ticker_{window_size}", callback)
+        await self.subscribe_callback(f"{symbol}@ticker_{window_size}", callback)
 
     async def window_tickers(self, callback: Callable, window_size: str) -> None:
-        await self.subscribe(f"!ticker_{window_size}@arr", callback)
+        await self.subscribe_callback(f"!ticker_{window_size}@arr", callback)
 
     async def book_ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe(f"{symbol}@bookTicker", callback)
+        await self.subscribe_callback(f"{symbol}@bookTicker", callback)
 
     async def partial_depth(
         self, callback: Callable, symbol: str, levels: int, update_speed: int = 1000
     ) -> None:
-        await self.subscribe(f"{symbol}@depth{levels}@{update_speed}ms", callback)
+        await self.subscribe_callback(
+            f"{symbol}@depth{levels}@{update_speed}ms", callback
+        )
 
     async def depth(
         self, callback: Callable, symbol: str, update_speed: int = 1000
     ) -> None:
-        await self.subscribe(f"{symbol}@depth@{update_speed}ms", callback)
+        await self.subscribe_callback(f"{symbol}@depth@{update_speed}ms", callback)
 
     async def _keep_alive_user_stream(
         self, listen_key: str, interval: int = 1800
@@ -155,14 +167,15 @@ class Websocket(Resource):
             await self.keep_alive_listen_key(listen_key)
 
     async def user_data(self, callback: Callable) -> None:
-        listen_key = await self.create_listen_key()
-        asyncio.ensure_future(self._keep_alive_user_stream(listen_key))
-        await self.subscribe(listen_key, callback)
+        if self._listen_key is None:
+            self._listen_key = await self.create_listen_key()
+            asyncio.ensure_future(self._keep_alive_user_stream(self._listen_key))
+        await self.subscribe_callback(self._listen_key, callback)
 
     async def _starter(self) -> None:
         try:
             async with self._client._session.ws_connect(
-                url=self._WEBSOCKET_URL, heartbeat=180
+                url=self._websocket_url, heartbeat=180
             ) as ws:
                 self._conn = ws
 
