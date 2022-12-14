@@ -230,7 +230,7 @@ class Websocket(Resource):
                             self._listeners.pop(data["id"])
                         elif "stream" in data:
                             for callback in self._stream_callbacks[data["stream"]]:
-                                await callback(data["data"])
+                                asyncio.ensure_future(callback(data["data"]))
         finally:
             self._last_id = 1
             self._listeners.clear()
