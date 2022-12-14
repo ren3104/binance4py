@@ -107,7 +107,17 @@ class Websocket(Resource):
     async def unsubscribe(self, stream: str) -> JsonObject:
         return await self._send("UNSUBSCRIBE", [stream])
 
-    async def unsubscribe_all_callbacks(self, stream) -> None:
+    async def unsubscribe_callback(self, stream: str, callback: Callable) -> None:
+        if stream in self._stream_callbacks:
+            if len(self._stream_callbacks[stream]) <= 1:
+                await self.unsubscribe_all_callbacks(stream)
+            else:
+                try:
+                    self._stream_callbacks[stream].remove(callback)
+                except ValueError:
+                    pass
+
+    async def unsubscribe_all_callbacks(self, stream: str) -> None:
         await self.unsubscribe(stream)
         if stream in self._stream_callbacks:
             self._stream_callbacks.pop(stream)
