@@ -32,8 +32,8 @@ def quantize_tick_size(
     rounding: Optional[str] = None,
 ) -> Decimal:
     if isinstance(num, (int, float)):
-        num = str(num)
-    if isinstance(num, str):
+        num = Decimal(str(num))
+    elif isinstance(num, str):
         num = Decimal(num)
 
     if isinstance(tick_size, str):
@@ -45,5 +45,5 @@ def quantize_tick_size(
 def number_to_string(num: Union[int, float, Decimal]) -> str:
     formatted_num = "{:f}".format(num)
     if "." in formatted_num:
-        return "{:f}".format(num).rstrip("0").rstrip(".")
+        return formatted_num.rstrip("0").rstrip(".")
     return formatted_num
