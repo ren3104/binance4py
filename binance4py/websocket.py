@@ -126,22 +126,22 @@ class Websocket(Resource):
         return (await self._send("LIST_SUBSCRIPTIONS"))["result"]
 
     async def aggregate_trade(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe_callback(f"{symbol}@aggTrade", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@aggTrade", callback)
 
     async def trade(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe_callback(f"{symbol}@trade", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@trade", callback)
 
     async def kline(self, callback: Callable, symbol: str, interval: str) -> None:
-        await self.subscribe_callback(f"{symbol}@kline_{interval}", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@kline_{interval}", callback)
 
     async def mini_ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe_callback(f"{symbol}@miniTicker", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@miniTicker", callback)
 
     async def mini_tickers(self, callback: Callable) -> None:
         await self.subscribe_callback("!miniTicker@arr", callback)
 
     async def ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe_callback(f"{symbol}@ticker", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@ticker", callback)
 
     async def tickers(self, callback: Callable) -> None:
         await self.subscribe_callback("!ticker@arr", callback)
@@ -149,25 +149,29 @@ class Websocket(Resource):
     async def window_ticker(
         self, callback: Callable, symbol: str, window_size: str
     ) -> None:
-        await self.subscribe_callback(f"{symbol}@ticker_{window_size}", callback)
+        await self.subscribe_callback(
+            f"{symbol.lower()}@ticker_{window_size}", callback
+        )
 
     async def window_tickers(self, callback: Callable, window_size: str) -> None:
         await self.subscribe_callback(f"!ticker_{window_size}@arr", callback)
 
     async def book_ticker(self, callback: Callable, symbol: str) -> None:
-        await self.subscribe_callback(f"{symbol}@bookTicker", callback)
+        await self.subscribe_callback(f"{symbol.lower()}@bookTicker", callback)
 
     async def partial_depth(
         self, callback: Callable, symbol: str, levels: int, update_speed: int = 1000
     ) -> None:
         await self.subscribe_callback(
-            f"{symbol}@depth{levels}@{update_speed}ms", callback
+            f"{symbol.lower()}@depth{levels}@{update_speed}ms", callback
         )
 
     async def depth(
         self, callback: Callable, symbol: str, update_speed: int = 1000
     ) -> None:
-        await self.subscribe_callback(f"{symbol}@depth@{update_speed}ms", callback)
+        await self.subscribe_callback(
+            f"{symbol.lower()}@depth@{update_speed}ms", callback
+        )
 
     async def _keep_alive_user_stream(
         self, listen_key: str, interval: int = 1800
