@@ -14,6 +14,7 @@ class Websocket(Resource):
     __slots__ = [
         "_websocket_url",
         "_conn",
+        "_exception",
         "_open_event",
         "_close_event",
         "_rate_limit",
@@ -32,6 +33,7 @@ class Websocket(Resource):
         )
 
         self._conn: Optional[ClientWebSocketResponse] = None
+        self._exception: Optional[BaseException] = None
         self._open_event = asyncio.Event()
         self._close_event = asyncio.Event()
 
@@ -205,6 +207,13 @@ class Websocket(Resource):
         await self.subscribe_callback(self._listen_key, callback)
         return self._listen_key
 
+    def _handle_task_exception(self, f: asyncio.Task) -> None:
+        if not f.cancelled():
+            exp = f.exception()
+            if exp is not None:
+                self._exception = exp
+                asyncio.create_task(self.stop())
+
     async def _starter(self) -> None:
         try:
             async with self._client._session.ws_connect(
@@ -230,7 +239,8 @@ class Websocket(Resource):
                             self._listeners.pop(data["id"])
                         elif "stream" in data:
                             for callback in self._stream_callbacks[data["stream"]]:
-                                asyncio.ensure_future(callback(data["data"]))
+                                task = asyncio.create_task(callback(data["data"]))
+                                task.add_done_callback(self._handle_task_exception)
         finally:
             self._last_id = 1
             self._listeners.clear()
@@ -256,3 +266,5 @@ class Websocket(Resource):
     async def wait_stop(self) -> None:
         if not self._close_event.is_set():
             await self._close_event.wait()
+            if self._exception is not None:
+                raise self._exception
