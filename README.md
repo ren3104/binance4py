@@ -32,7 +32,7 @@ async def handle_kline(k):
 
 
 async def main():
-    client = Binance("<API_KEY>", "<API_SECRET>")
+    client = Binance("<API_KEY>", "<API_SECRET>", testnet=True)
     async with client:
         print(await client.general.server_time())
         await client.ws.start()
@@ -42,4 +42,24 @@ async def main():
 
 
 asyncio.run(main())
+```
+
+## Using a different TLD and Cluster
+This example will change all binance urls that support this from `https://api.binance.com` to `https://api2.binance.jp`
+```
+client = Binance(
+    tld="jp",
+    cluster=2
+)
+```
+
+## Using a different json dumper/loader
+```
+import ujson
+
+
+client = Binance(
+    json_dumps=ujson.dumps,
+    json_loads=ujson.loads
+)
 ```
