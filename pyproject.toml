@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "binance4py"
-version = "1.0.0rc1"
+version = "1.0.0"
 description = "Python binance API wrapper"
 authors = ["ren3104 <2ren3104@gmail.com>"]
 license = "MIT"
