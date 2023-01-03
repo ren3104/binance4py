@@ -8,7 +8,7 @@ from aiohttp import ClientSession, ContentTypeError
 
 from binance4py.endpoints import Endpoints
 from binance4py.exception import BinanceApiException
-from binance4py.typing import JsonDumper, JsonLoader, JsonObject
+from binance4py.typing import JsonDumper, JsonLoader
 from binance4py.utils import create_query_dict, get_timestamp
 
 API_URL = "https://api{}.binance.{}/api/"
@@ -75,7 +75,7 @@ class Client:
         url: str,
         signed: bool = False,
         params: Optional[Dict[str, Any]] = None,
-    ) -> JsonObject:
+    ) -> Any:
         if params is not None:
             params = create_query_dict(params)
 

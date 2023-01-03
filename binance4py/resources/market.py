@@ -15,7 +15,7 @@ class Market(Resource):
 
     async def recent_trades(
         self, symbol: str, limit: Optional[int] = None
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.recent_trades,
@@ -24,7 +24,7 @@ class Market(Resource):
 
     async def old_trades(
         self, symbol: str, limit: Optional[int] = None, from_id: Optional[int] = None
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.old_trades,
@@ -38,7 +38,7 @@ class Market(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.aggregate_trades,
@@ -58,7 +58,7 @@ class Market(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.klines,
@@ -78,7 +78,7 @@ class Market(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.ui_klines,
@@ -102,7 +102,7 @@ class Market(Resource):
         self,
         symbols: Optional[Union[str, List[str]]] = None,
         type: Optional[str] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         if isinstance(symbols, str):
             symbols = [symbols]
 
@@ -114,7 +114,7 @@ class Market(Resource):
 
     async def price_ticker(
         self, symbols: Optional[Union[str, List[str]]] = None
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         if isinstance(symbols, str):
             symbols = [symbols]
 
@@ -126,7 +126,7 @@ class Market(Resource):
 
     async def order_book_ticker(
         self, symbols: Optional[Union[str, List[str]]] = None
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         if isinstance(symbols, str):
             symbols = [symbols]
 
@@ -141,7 +141,7 @@ class Market(Resource):
         symbols: Union[str, List[str]],
         window_size: Optional[str] = None,
         type: Optional[str] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         if isinstance(symbols, str):
             symbols = [symbols]
 

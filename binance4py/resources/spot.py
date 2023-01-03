@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from binance4py.typing import JsonObject
 
@@ -104,7 +104,7 @@ class Spot(Resource):
             },
         )
 
-    async def cancel_all_open_orders(self, symbol: str) -> JsonObject:
+    async def cancel_all_open_orders(self, symbol: str) -> List[JsonObject]:
         return await self._client.request(
             method="DELETE",
             url=self._client._api_url + self._client._endpoints.cancel_all_open_orders,
@@ -176,7 +176,7 @@ class Spot(Resource):
             },
         )
 
-    async def open_orders(self, symbol: Optional[str] = None) -> JsonObject:
+    async def open_orders(self, symbol: Optional[str] = None) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.open_orders,
@@ -191,7 +191,7 @@ class Spot(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.all_orders,
@@ -292,7 +292,7 @@ class Spot(Resource):
         start_time: Optional[int] = None,
         end_time: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.query_all_oco_order,
@@ -305,7 +305,7 @@ class Spot(Resource):
             },
         )
 
-    async def query_open_oco_order(self) -> JsonObject:
+    async def query_open_oco_order(self) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.query_open_oco_order,
@@ -327,7 +327,7 @@ class Spot(Resource):
         end_time: Optional[int] = None,
         from_id: Optional[int] = None,
         limit: Optional[int] = None,
-    ) -> JsonObject:
+    ) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.account_trade_list,
@@ -342,7 +342,7 @@ class Spot(Resource):
             },
         )
 
-    async def order_rate_limit(self) -> JsonObject:
+    async def order_rate_limit(self) -> List[JsonObject]:
         return await self._client.request(
             method="GET",
             url=self._client._api_url + self._client._endpoints.order_rate_limit,
